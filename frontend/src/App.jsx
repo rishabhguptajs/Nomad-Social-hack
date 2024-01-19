@@ -1,13 +1,11 @@
-
 import "./App.css";
-import Sidebar from "./component/sidebar/sideba";
+import { Router, Route, BrowserRouter } from "react-router-dom";
+import Dashboard from "./pages/Dashboard.jsx";
 
 function App() {
   return (
     <>
-      <div>
-       <Sidebar />
-      </div>
+      <Dashboard />
     </>
   );
 }
