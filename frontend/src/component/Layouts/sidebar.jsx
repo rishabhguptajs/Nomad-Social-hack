@@ -15,7 +15,7 @@ const Sidebar = () => {
 setIsOpen(!isOpen)
     }
 return (
-    <div className="bg-[#1C1F37] flex flex-col h-[100vh]  sm:w-64 md:w-80 lg:w-96 xl:w-[40vh] justify-between font-helvetica">
+    <div className="bg-[#1C1F37] text-white flex flex-col h-[100vh]  sm:w-64 md:w-80 lg:w-96 xl:w-[40vh] justify-between font-helvetica">
         <div className=" btn  sm:hidden flex justify-end">
 <GiHamburgerMenu size={32}  onClick={toggleSidebar} />
         </div>

@@ -1,0 +1,17 @@
+*{
+    font-family: 'Poppins', sans-serif;
+}
+
+
+.search_input::placeholder {
+    color: #626577;
+    font-size: 0.95rem;
+    font-weight: 400; 
+}
+
+
+.search_btn:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(170, 170, 170, 0.2);
+    transition-duration: 0.1s;
+}
