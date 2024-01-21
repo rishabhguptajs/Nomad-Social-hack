@@ -1,11 +1,16 @@
 import "./App.css";
-import { Router, Route, BrowserRouter } from "react-router-dom";
-import Dashboard from "./pages/Dashboard.jsx";
+import Sidebar from "./component/sidebar/sideba";
 
 function App() {
+  const mode = useSelector((state) => state.mode)
+  const theme = useMemo(() => 
+    createTheme(themeSettings(mode)), [mode]
+  );
   return (
     <>
-      <Dashboard />
+      <div>
+       <Sidebar />
+      </div>
     </>
   );
 }
