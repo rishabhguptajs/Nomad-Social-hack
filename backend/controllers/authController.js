@@ -1,86 +1,55 @@
-import userModel from "../models/userModel.js";
-import { hashedPassword, comparePassword } from "../helpers/authHelper.js";
-import JWT from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import User from "../models/userModel.js";
 
 export const registerController = async (req, res) => {
   try {
-    const { name, email, password, phone, address } = req.body;
-    if (!name || !email || !password || !phone || !address) {
-      return res.status(400).json({
-        status: "failed",
-        message: "All fields are required",
-      });
-    }
-    const hashPassword = await hashedPassword(password);
-    const user = await userModel.create({
-      name,
+    const {
+      firstName,
+      lastName,
       email,
-      password: hashPassword,
-      phone,
-      address,
-    });
+      password,
+      picturePath,
+      friends,
+      location,
+      occupation,
+    } = req.body;
 
-    res.status(201).send({
-      success: true,
-      message: "User Registered Successfully",
-      user,
-    });
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(password, salt);
 
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      status: "failed",
-      message: "Internal Server Error",
-      error,
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      password: passwordHash,
+      picturePath,
+      friends,
+      location,
+      occupation,
+      viewedProfile: Math.floor(Math.random() * 10000),
+      impressions: Math.floor(Math.random() * 10000),
     });
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
-
 
 export const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password ) {
-      return res.status(400).json({
-        status: "failed",
-        message: "All fields are required",
-      });
-    }
+    const user = await User.findOne({ email: email });
+    if (!user) return res.status(400).json({ msg: "User does not exist. " });
 
-    const user = await userModel.findOne({ email });
-    console.log(user);
-    if (!user) {
-      return res.status(400).json({
-        status: "failed",
-        message: "Invalid Credentials",
-      });
-    };
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials. " });
 
-    const isMatch = await comparePassword(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({
-        status: "failed",
-        message: "Wrong Password",
-      });
-    };
-
-    const token = await JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "30d",
-    });
-
-    res.status(200).json({
-      status: "success",
-      message: "User Logged In Successfully",
-      token,
-      user,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      status: "failed",
-      message: "Internal Server Error",
-      error,
-    });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    delete user.password;
+    res.status(200).json({ token, user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-}
+};
